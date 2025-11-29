@@ -93,6 +93,13 @@
 			<scope>test</scope>
 		</dependency>
 
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- JWT dependency -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -111,7 +118,12 @@
             <version>0.11.5</version>
             <scope>runtime</scope>
         </dependency>
-	</dependencies>
+        <!-- Redis dependency -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
@@ -139,6 +151,27 @@
 					</excludes>
 				</configuration>
 			</plugin>
+            <!-- Plugin for test coverage report -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.7</version>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 

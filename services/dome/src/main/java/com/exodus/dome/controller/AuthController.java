@@ -2,6 +2,7 @@ package com.exodus.dome.controller;
 
 import com.exodus.dome.entity.dto.AuthResponse;
 import com.exodus.dome.entity.dto.LoginRequest;
+import com.exodus.dome.entity.dto.LogoutRequest;
 import com.exodus.dome.entity.dto.RefreshRequest;
 import com.exodus.dome.entity.dto.RegisterRequest;
 import com.exodus.dome.service.AuthService;
@@ -37,5 +38,17 @@ public class AuthController {
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         AuthResponse response = authService.refresh(request);
         return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(@Valid @RequestBody LogoutRequest logoutRequest) {
+    authService.logout(logoutRequest);
+    return ResponseEntity.noContent().build();
+  }
+
+  @PostMapping("/logout-all")
+  public ResponseEntity<Void> logoutAll(@Valid @RequestBody LogoutRequest logoutRequest) {
+    authService.logoutAllSessions(logoutRequest);
+    return ResponseEntity.noContent().build();
   }
 }
