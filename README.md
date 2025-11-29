@@ -1,4 +1,4 @@
-# Exodus - Routing Solution
+# Exodus
 
 ## Project Structure
 
@@ -22,25 +22,14 @@ exodus/
 - Redis
 - Postgresql 16
 
-### Run a Service
-
-```bash
-cd services/dome
-./mvnw spring-boot:run
-```
-
 ## Services
 
-| Servis | Port | Açıklama                         |
-| ------ | ---- | -------------------------------- |
-| dome   | 8081 | Authentication & User Management |
-| wall   | 8082 | Profile Management Service       |
+| Service | Port | Its Job                          |
+| ------- | ---- | -------------------------------- |
+| dome    | 8081 | Authentication & User Management |
+| wall    | 8082 | Profile Management Service       |
 
-## Environment Variables
-
-- For now the arbitrary values are being held in repo.
-
-## 🔧 Development
+## Development
 
 ```bash
 # Build all services
@@ -50,6 +39,6 @@ cd services/dome
 ./test-all.sh
 ```
 
-## 📝 License
+## License
 
 MIT License
