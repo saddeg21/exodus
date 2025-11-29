@@ -1,0 +1,17 @@
+package com.exodus.wall.entity.dto;
+
+import java.time.OffsetDateTime;
+import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class RiderProfileResponse {
+  private UUID id;
+  private String fullName;
+  private String phoneNumber;
+  private Double ratingAverage;
+  private OffsetDateTime createdAt;
+
+}

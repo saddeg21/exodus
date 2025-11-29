@@ -1,0 +1,42 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+
+# Build outputs
+target/
+build/
+out/
+*.class
+*.jar
+*.war
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+*.env
+
+# Maven
+.mvn/repository/
+
+# Gradle
+.gradle/
+gradle/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Test outputs
+test-output/
+surefire-reports/

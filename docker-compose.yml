@@ -1,0 +1,86 @@
+version: "3.8"
+
+services:
+  # ===================
+  # Infrastructure
+  # ===================
+  postgres:
+    image: postgres:16-alpine
+    container_name: exodus-postgres
+    environment:
+      POSTGRES_USER: exodus
+      POSTGRES_PASSWORD: exodus123
+      POSTGRES_DB: exodus_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - exodus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U exodus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: exodus-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - exodus-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ===================
+  # Microservices
+  # ===================
+  dome:
+    build:
+      context: ./services/dome
+      dockerfile: Dockerfile
+    container_name: exodus-dome
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/exodus_db
+      SPRING_DATASOURCE_USERNAME: exodus
+      SPRING_DATASOURCE_PASSWORD: exodus123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - exodus-network
+
+  wall:
+    build:
+      context: ./services/wall
+      dockerfile: Dockerfile
+    container_name: exodus-wall
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/exodus_db
+      SPRING_DATASOURCE_USERNAME: exodus
+      SPRING_DATASOURCE_PASSWORD: exodus123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - exodus-network
+
+networks:
+  exodus-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:

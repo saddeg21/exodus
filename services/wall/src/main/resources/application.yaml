@@ -1,0 +1,34 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: wall
+  datasource:
+    url: jdbc:postgresql://localhost:5432/exodus
+    username: tcadastan
+    password: deniz
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none # I am managing sql by myself with scripts
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: profile # write schema name to there
+    open-in-view: false # better performance and avoid lazy loading issues
+
+  datasource-hikari:
+    maximum-pool-size: 10
+    minimum-idle: 2
+    idle-timeout: 30000
+    pool-name: ProfileHikariPool
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+

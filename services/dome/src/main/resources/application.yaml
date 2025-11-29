@@ -1,0 +1,40 @@
+server:
+  port: 8761
+
+spring:
+  application:
+    name: dome
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/exodus
+    username: tcadastan
+    password: deniz
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        default_schema: auth
+        format_sql: true
+    show-sql: true
+    open-in-view: false
+
+    datasource.hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+auth:
+  jwt:
+    secret: "KGSv3EblCTdoknqf5LznnLvct2BVq6hdzKIH0JZCAFV"
+    issuer: "exodus-auth"
+    access-token-validity-seconds: 60 # 1 minute
+    refresh-token-validity-seconds: 1209600 # 14 days
