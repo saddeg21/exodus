@@ -1,7 +1,7 @@
 # Dome
 
-[![CI](https://github.com/saddeg21/exodus/actions/workflows/ci.yml/badge.svg)](https://github.com/saddeg21/exodus/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/saddeg21/exodus/branch/main/graph/badge.svg)](https://codecov.io/gh/saddeg21/exodus)
+[![CI](https://github.com/saddeg21/exodus/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/saddeg21/exodus/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/saddeg21/exodus/branch/develop/graph/badge.svg)](https://codecov.io/gh/saddeg21/exodus)
 
 Dome is the authentication and authorization service for the Exodus platform. It handles user registration, login, and token management.
 
