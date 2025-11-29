@@ -12,6 +12,7 @@ import com.exodus.dome.repository.UserRepository;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.UUID;
 import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,18 +29,21 @@ public class AuthService {
   private final JwtService jwtService;
   private final long refreshTokenValiditySeconds;
   private final SecureRandom secureRandom = new SecureRandom();
+  private RefreshTokenCacheService refreshTokenCacheService;
       // For generating secure random values
 
   @Autowired
   public AuthService(UserRepository userRepository, RefreshTokenRepository refreshTokenRepository,
                      PasswordEncoder passwordEncoder,
                      JwtService jwtService, @Value("${auth.jwt.refresh-token-validity-seconds}")
-                     long refreshTokenValiditySeconds) {
+                     long refreshTokenValiditySeconds,
+                     RefreshTokenCacheService refreshTokenCacheService) {
     this.refreshTokenRepository = refreshTokenRepository;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.jwtService = jwtService;
     this.refreshTokenValiditySeconds = refreshTokenValiditySeconds;
+    this.refreshTokenCacheService = refreshTokenCacheService;
   }
 
   public void register(RegisterRequest request) {
@@ -82,11 +86,36 @@ public class AuthService {
 
   @Transactional
   public AuthResponse refresh(RefreshRequest request) {
-    RefreshToken storedToken = refreshTokenRepository.findByToken(request.getRefreshToken())
-        .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token!"));
+    String tokenValue = request.getRefreshToken();
 
+    // 1) First check redis if token exists
+    Optional<UUID> userIdFromCache = refreshTokenCacheService.getUserIdForToken(tokenValue);
+
+    RefreshToken storedToken;
+
+    if(userIdFromCache.isEmpty()) {
+        // 2) If not in cache, check DB
+      storedToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+          .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token!"));
+
+      // if token is suspicious, throw error
+      if (storedToken.isRevoked() || storedToken.isExpired()) {
+        throw new IllegalArgumentException("Refresh token is no longer valid!");
+      }
+
+      // cache miss :///
+    } else {
+      // cache hit :)
+      storedToken = refreshTokenRepository.findByToken(request.getRefreshToken())
+          .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token!"));
+    }
+
+    // Delete token from redis if it does exist
+    refreshTokenCacheService.deleteToken(tokenValue);
+
+    // if cache hit, then check db for suspicious token
     if (storedToken.isRevoked() || storedToken.isExpired()) {
-      throw new IllegalArgumentException("Refresh token is no longer valid!");
+      throw new IllegalArgumentException("Refresh token expired or revoked");
     }
 
     //**
@@ -118,6 +147,7 @@ public class AuthService {
     Instant now = Instant.now();
     Instant expiry = now.plusSeconds(refreshTokenValiditySeconds);
 
+    // 1) Token is being stored in DB for reuse detection and etc.
     RefreshToken refreshToken = new RefreshToken(
         UUID.randomUUID(),
         user,
@@ -128,6 +158,10 @@ public class AuthService {
     );
 
     refreshTokenRepository.save(refreshToken);
+
+    // 2) Also store it in cache for fast validation
+    refreshTokenCacheService.storeToken(tokenValue, user.getId(), refreshTokenValiditySeconds);
+
     return tokenValue;
   }
 
